@@ -5,7 +5,8 @@
 
 #  songci
 
-## Meaning
+## Description
+`songci` is a CLI that allows you to check proxy server on a forensic way. The results of a proxy check are very detailed and extensive. A simple and powerful python API makes it easy to implement it in your project.
 > Song Ci was a Chinese physician, judge, forensic medical scientist, anthropologist, and writer of the Southern Song dynasty. He was the first known anthropologist who wrote a groundbreaking book titled Collected Cases of Injustice Rectified.
 
 ## Install
