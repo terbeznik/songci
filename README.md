@@ -1,6 +1,6 @@
 
 <p align="center"> 
-    <img src="https://github.com/terbeznik/songci/bin/logo.png">
+    <img src="https://github.com/terbeznik/songci/blob/master/bin/logo.png">
 </p>
 
 #  songci
