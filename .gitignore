@@ -4,3 +4,4 @@ build/
 songci.egg-info/
 dist/
 2019*/
+.DS_Store

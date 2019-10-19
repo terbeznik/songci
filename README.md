@@ -1,4 +1,9 @@
-# **<span style="background-color: rgb(17,5,7); color: rgb(134,1,17)">宋慈</span>** songci
+
+<p align="center"> 
+    <img src="https://github.com/terbeznik/songci/bin/logo.png">
+</p>
+
+#  songci
 
 ## Meaning
 > Song Ci was a Chinese physician, judge, forensic medical scientist, anthropologist, and writer of the Southern Song dynasty. He was the first known anthropologist who wrote a groundbreaking book titled Collected Cases of Injustice Rectified.
@@ -20,7 +25,9 @@ $ songci -p 103.60.137.2:41630
 
 ```console
 $ songci -p 118.174.220.133:50616 185.18.64.106:53281 180.254.90.87:8080
-180.254.90.87:8080 http=transparent https=elite evil           118.174.220.133:50616 http=elite https=failed                        185.18.64.106:53281 http=failed https=failed
+180.254.90.87:8080 http=transparent https=elite evil
+118.174.220.133:50616 http=elite https=failed
+185.18.64.106:53281 http=failed https=failed
 ```
 
 ### Random proxies
