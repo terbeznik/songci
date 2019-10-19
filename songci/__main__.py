@@ -13,7 +13,12 @@ def main():
     parser.add_argument("--timeout", type=int, default=api.TIMEOUT)
     parser.add_argument("--random", "-r", type=int)
     parser.add_argument("--output", "-o", action="store_true")
+    parser.add_argument("--version", "-V", action="store_true")
     args = parser.parse_args(sys.argv[1:])
+
+    # VERSION
+    if args.version:
+        print("0.0.5")
 
     # PROXIES
     proxy_data = []
