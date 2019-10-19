@@ -65,7 +65,7 @@ def get_proxy():
 
 
 def get_timestamp():
-    return datetime.datetime.utcnow().strftime('%Y-%m-%dT%H_%M_%S')
+    return datetime.datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S')
 
 
 def write(data, content_manipilation_as_html=True):
@@ -82,7 +82,7 @@ def write(data, content_manipilation_as_html=True):
                     try:
                         html = result["check_html"][protocol]["content_manipulation"]
                         if html:
-                            html_path = f"{name}/{result['ip']}:{result['port']} ({protocol}).html"
+                            html_path = f"{name}/{result['ip']}_{result['port']}_{protocol}.html"
                             with open(html_path, "w") as f:
                                 f.write(html)
                     except Exception as e:
@@ -93,5 +93,7 @@ def write(data, content_manipilation_as_html=True):
         with open(summary_path, "w") as f:
             json.dump(data, f, indent=4)
     elif isinstance(data, dict):
-        summary_path = f"./{name}_{data['ip']}:{data['port']}.json"
-
+        name = data["end"]
+        summary_path = f"./{name}_{data['ip']}_{data['port']}.json"
+        with open(summary_path, "w") as f:
+            json.dump(data, f)
