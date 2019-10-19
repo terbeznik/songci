@@ -5,12 +5,23 @@ import json
 
 from multiprocessing.dummy import Pool as ThreadPool
 from tqdm import tqdm
+from colorama import init as init_colorama
+from colorama import Fore, Back, Style
 
 from . import helper
 
 THREADS = 4
 TIMEOUT = 60
 PROTOCOLS = ["http", "https"]
+
+init_colorama()
+ANONYMITY_LEVEL_OUTPUT = {
+    1: f"{Style.BRIGHT}transparent{Style.RESET_ALL}",
+    2: f"{Style.BRIGHT}{Fore.CYAN}anonymous{Style.RESET_ALL}",
+    3: f"{Style.BRIGHT}{Fore.GREEN}elite{Style.RESET_ALL}",
+    None: f"{Style.BRIGHT}{Fore.RED}failed{Style.RESET_ALL}"
+}
+CONTENT_MANIPULATION_OUTPUT = f"{Style.BRIGHT}{Back.RED}evil{Style.RESET_ALL}"
 
 
 class Check():
@@ -56,6 +67,25 @@ class Check():
 
     def __str__(self):
         return json.dumps(self.result, indent=4)
+
+    @property
+    def result_for_humans(self):
+        http = ANONYMITY_LEVEL_OUTPUT[self.result["check_headers"]["http"]["anonymity_level"]]
+        https = ANONYMITY_LEVEL_OUTPUT[self.result["check_headers"]["https"]["anonymity_level"]]
+
+        if self.result["check_html"]["http"]["content_manipulation"] or self.result["check_html"]["https"]["content_manipulation"]:
+            content_manipulation = CONTENT_MANIPULATION_OUTPUT
+        else:
+            content_manipulation = ""
+
+        cols = [
+            f"{self.ip}:{self.port}",
+            f"http={http}",
+            f"https={https}",
+            content_manipulation
+        ]
+
+        return f" ".join(cols)
 
     def get_reference_html():
         url = f"https://{Check.HTML_URL}"
@@ -104,6 +134,7 @@ class Check():
                 "status_code_on_proxy": None,
                 "client_request_headers": None,
                 "server_request_headers": None,
+                "anonymity_level": None,
                 "response_headers": None,
                 "error": None
             }
@@ -170,10 +201,12 @@ class Check():
 
 def check(proxy_data, threads=THREADS, timeout=TIMEOUT):
     if isinstance(proxy_data, str):
-        c = Check(proxy_data, timeout=timeout)
-        c.run()
-        return c.result
+        proxies = [proxy_data]
     elif isinstance(proxy_data, list):
+        proxies = proxy_data
+
+    if len(proxies) > 1:
+        threads = threads if len(proxies) > threads else len(proxies)
         reference_html = Check.get_reference_html()
         reference_ip = Check.get_reference_ip()
 
@@ -183,6 +216,7 @@ def check(proxy_data, threads=THREADS, timeout=TIMEOUT):
                       reference_ip=reference_ip,
                       timeout=timeout)
             c.run()
+            tqdm.write(c.result_for_humans)
             return c.result
 
         pool = ThreadPool(threads)
@@ -191,3 +225,9 @@ def check(proxy_data, threads=THREADS, timeout=TIMEOUT):
         pool.close()
         pool.join()
         return results
+    elif len(proxies) == 1:
+        proxy = proxies[0]
+        c = Check(proxy, timeout=timeout)
+        c.run()
+        print(c.result_for_humans)
+        return c.result

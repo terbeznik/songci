@@ -23,7 +23,8 @@ setuptools.setup(
     install_requires=[
         "requests",
         "tqdm",
-        "beautifulsoup4"
+        "beautifulsoup4",
+        "colorama"
     ],
     entry_points={
         'console_scripts': [
