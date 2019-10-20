@@ -10,6 +10,8 @@ from bs4 import BeautifulSoup
 from . import api
 from . import data
 
+RANGES = data.RANGES
+
 
 def get_country(ip):
     ip = ipaddress.ip_address(ip)
@@ -17,12 +19,12 @@ def get_country(ip):
         "country_code": None,
         "country_name": None
     }
-    for r in data.RANGES:
-        ip_from = ipaddress.ip_address(r["ip_from"])
-        ip_to = ipaddress.ip_address(r["ip_to"])
-        if ip_from < ip < ip_to:
-            result["country_code"] = r["country_code"]
-            result["country_name"] = r["country_name"]
+    for net in RANGES.keys():
+        if ipaddress.IPv4Network(f"{ip}/32").subnet_of(ipaddress.IPv4Network(net, strict=False)):
+            country_code = RANGES[net]["country_code"]
+            country_name = RANGES[net]["country_name"]
+            result["country_code"] = country_code
+            result["country_name"] = country_name
             return result
     return result
 
