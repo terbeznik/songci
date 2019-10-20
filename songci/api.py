@@ -70,7 +70,6 @@ class Check():
 
     @property
     def result_for_humans(self):
-        country = f"{Style.DIM}{Fore.CYAN}{self.result['country_name']}{Style.RESET_ALL}" if self.result["country_name"] else ""
         http = ANONYMITY_LEVEL_OUTPUT[self.result["check_headers"]["http"]["anonymity_level"]]
         https = ANONYMITY_LEVEL_OUTPUT[self.result["check_headers"]["https"]["anonymity_level"]]
 
@@ -81,7 +80,6 @@ class Check():
 
         cols = [
             f"{self.ip}:{self.port}",
-            country,
             f"http={http}",
             f"https={https}",
             content_manipulation
@@ -116,7 +114,6 @@ class Check():
     def run(self):
         self.begin = helper.get_timestamp()
 
-        self.check_country()
         self.check_headers()
         self.check_html()
 
@@ -124,10 +121,6 @@ class Check():
 
         self.result["begin"] = self.begin
         self.result["end"] = self.end
-
-    def check_country(self):
-        result = helper.get_country(self.ip)
-        self.result.update(result)
 
     def check_headers(self):
         self.result["check_headers"] = {}

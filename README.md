@@ -32,7 +32,7 @@ $ songci -p 103.60.137.2:41630
 
 ```console
 $ songci -p 118.174.220.133:50616 185.18.64.106:53281 180.254.90.87:8080
-180.254.90.87:8080 http=transparent https=elite evil
+180.254.90.87:8080 http=transparent https=elite manipulation
 118.174.220.133:50616 http=elite https=failed
 185.18.64.106:53281 http=failed https=failed
 ```
@@ -68,7 +68,7 @@ Each check contains a json with **complete results** and a HTML file of each **c
 
 ```
 2019-10-19T10_34_30/
-|--- 180.254.90.87:8080 (http).html
+|--- 180.254.90.87_8080_http.html
 |--- summary.json
 ```
 
@@ -92,8 +92,8 @@ Structure of results inside `summary.json`
 ```console
 $ sonci -r 100 -t 10
 ```
-
-### Timeout
+pso
+#### Timeout
 Each check contains multiple HTTP-Requests. Default timeout for each request is 60 seconds. You can change it with `--timeout`.
 
 ```

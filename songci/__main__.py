@@ -17,7 +17,7 @@ def main():
 
     # VERSION
     if args.version:
-        print("0.0.7")
+        print("0.0.8")
 
     # PROXIES
     proxy_data = []

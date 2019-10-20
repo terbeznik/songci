@@ -7,7 +7,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="songci",
-    version="0.0.7",
+    version="0.0.8",
     author="Alexander Terbeznik",
     author_email="alexander.terbeznik@gmail.com",
     description="songci checks proxies",
