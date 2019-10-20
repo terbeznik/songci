@@ -1,6 +1,5 @@
 #!/bin/bash
-rm -r 2019*
-rm 2019*
+rm songci_*.json
 rm -r dist
 rm -r build
 rm -r songci.egg-info

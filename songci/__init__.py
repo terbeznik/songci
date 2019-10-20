@@ -1,24 +1,9 @@
-from .api import Check, check
-from .helper import (
-    free_proxy_list_net,
-    spys_me,
-    proxy_daily_com,
-    proxyscrape_com,
-    get_proxies,
-    get_proxy,
-    get_timestamp,
-    write
+from .__version__ import (
+    __title__,
+    __description__,
+    __url__,
+    __version__,
+    __author__,
+    __author_email__,
 )
-
-__all__ = [
-    "Check",
-    "check",
-    "free_proxy_list_net",
-    "spys_me",
-    "proxy_daily_com",
-    "proxyscrape_com",
-    "get_proxies",
-    "get_proxy",
-    "get_timestamp",
-    "write"
-]
+from .api import check

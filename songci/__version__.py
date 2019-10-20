@@ -1,0 +1,6 @@
+__title__ = 'songci'
+__description__ = 'songci checks proxies'
+__url__ = 'https://github.com/terbeznik/songci'
+__version__ = '0.0.9'
+__author__ = 'Alexander Terbeznik'
+__author_email__ = 'alexander.terbeznik@gmail.com'

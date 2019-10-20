@@ -6,3 +6,4 @@ dist/
 2019*/
 .DS_Store
 ranges.json
+proxies.txt
