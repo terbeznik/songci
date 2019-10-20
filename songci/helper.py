@@ -8,9 +8,7 @@ import ipaddress
 from bs4 import BeautifulSoup
 
 from . import api
-
-with open("ranges.json", "r") as f:
-    RANGES = json.load(f)
+from . import data
 
 
 def get_country(ip):
@@ -19,7 +17,7 @@ def get_country(ip):
         "country_code": None,
         "country_name": None
     }
-    for r in RANGES:
+    for r in data.RANGES:
         ip_from = ipaddress.ip_address(r["ip_from"])
         ip_to = ipaddress.ip_address(r["ip_to"])
         if ip_from < ip < ip_to:
