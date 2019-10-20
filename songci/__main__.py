@@ -49,12 +49,13 @@ def main():
         path = args.input
         proxies += helper.read(path)
 
-    # CHECK
-    result = api.check(proxies, timeout=args.timeout)
+    if proxies:
+        # CHECK
+        result = api.check(proxies, timeout=args.timeout)
 
-    # WRITE
-    if args.output:
-        helper.write(result)
+        # WRITE
+        if args.output:
+            helper.write(result)
 
 
 if __name__ == "__main__":
