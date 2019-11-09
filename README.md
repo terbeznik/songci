@@ -25,24 +25,13 @@ $ pip install songci
 
 ```console
 $ songci --help
-usage: __main__.py [-h] [--version] [--output] [--input INPUT]
-                   [--timeout TIMEOUT]
-                   [proxies [proxies ...]]
+Usage: __main__.py [OPTIONS] [PROXIES]...
 
-songci checks proxies
-
-positional arguments:
-  proxies               single proxy host:port or multiple whitespace
-                        seperated proxies
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --version, -V         current version
-  --output, -o          write results songci_<TIMESTAMP>.json
-  --input INPUT, -i INPUT
-                        use proxy list file
-  --timeout TIMEOUT, -t TIMEOUT
-                        set timeout per request (default: 60)
+Options:
+  --version
+  -i FILENAME  Input from list of proxies
+  -o FILENAME  Outputfilename to write summary as json
+  --help       Show this message and exit.
 ```
 
 ## Examples
@@ -91,14 +80,13 @@ $ songci -i proxies.txt
 Use `-o` flag to save results in a JSON-File
 
 ```console
-$ songci 95.175.14.54:8080 104.167.113.48:3128 -o
+$ songci 95.175.14.54:8080 104.167.113.48:3128 -o summary.json
 ```
 
-Example output file `songci_2019-10-20T19-35-41.json`
+Example output file `summary.json`
 
 ```json
 {
-    "name": "songci_2019-10-20T19-35-41",
     "begin": "2019-10-20T19-35-41",
     "end": "2019-10-20T19-36-24",
     "threads": 2,

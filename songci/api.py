@@ -216,7 +216,6 @@ def check(proxies, timeout=TIMEOUT):
     end = helper.get_timestamp()
 
     return {
-        "name": f"songci_{begin}",
         "begin": begin,
         "end": end,
         "threads": threads,
