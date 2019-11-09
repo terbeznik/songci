@@ -31,7 +31,7 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': [
-            'songci=songci.cli',
+            'songci=songci.__main__.cli',
         ]
     }
 )
