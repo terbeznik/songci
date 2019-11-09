@@ -25,7 +25,7 @@ $ pip install songci
 
 ```console
 $ songci --help
-Usage: __main__.py [OPTIONS] [PROXIES]...
+Usage: songci [OPTIONS] [PROXIES]...
 
 Options:
   --version
