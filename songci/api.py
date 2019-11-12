@@ -84,6 +84,8 @@ class Check():
         self.result = {}
         self.result["ip"] = self.ip
         self.result["port"] = self.port
+        self.result["begin"] = self.raw["begin"]
+        self.result["end"] = self.raw["end"]
         self.result["http"] = self.raw["check_headers"]["http"]["anonymity_level"]
         self.result["https"] = self.raw["check_headers"]["https"]["anonymity_level"]
         if self.raw["check_html"]:
