@@ -1,15 +1,19 @@
 import requests
 import socket
 import hashlib
+import time
 
 from multiprocessing.dummy import Pool as ThreadPool
 from multiprocessing import cpu_count
 from tqdm import tqdm
 
-from . import helper
 from .__version__ import __title__, __version__
 
 TIMEOUT = 60
+
+
+def get_timestamp():
+    return int(time.time())
 
 
 def get_reference_html():
@@ -98,12 +102,12 @@ class Check():
         return "elite"
 
     def run(self):
-        self.begin = helper.get_timestamp()
+        self.begin = get_timestamp()
 
         self.check_headers()
         self.check_html()
 
-        self.end = helper.get_timestamp()
+        self.end = get_timestamp()
 
         self.raw["begin"] = self.begin
         self.raw["end"] = self.end
@@ -185,7 +189,7 @@ class Check():
 
 
 def check(proxies, timeout=TIMEOUT):
-    begin = helper.get_timestamp()
+    begin = get_timestamp()
     max_threads = cpu_count()*10
     if max_threads > len(proxies):
         threads = len(proxies)
@@ -213,7 +217,7 @@ def check(proxies, timeout=TIMEOUT):
     pool.close()
     pool.join()
 
-    end = helper.get_timestamp()
+    end = get_timestamp()
 
     return {
         "begin": begin,
