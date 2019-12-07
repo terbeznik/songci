@@ -7,3 +7,4 @@ from .__version__ import (
     __author_email__,
 )
 from .api import check
+from .api import Check

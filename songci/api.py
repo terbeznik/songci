@@ -9,12 +9,6 @@ from tqdm import tqdm
 
 from .__version__ import __title__, __version__
 
-TIMEOUT = 60
-
-
-def get_timestamp():
-    return int(time.time())
-
 
 def get_reference_html():
         url = f"https://{Check.HTML_URL}"
@@ -47,14 +41,12 @@ class Check():
         "Xroxy-Connection"
     ],
     PROTOCOLS = ["http", "https"]
+    TIMEOUT = 60
 
     def __init__(self,
                  proxy,
                  reference_html=None,
-                 reference_ip=None,
-                 timeout=TIMEOUT):
-
-        self.timeout = timeout
+                 reference_ip=None):
 
         try:
             self.proxy = proxy.replace(" ", "")
@@ -68,30 +60,42 @@ class Check():
         self.reference_ip = reference_ip if reference_ip else get_reference_ip()
         self.session = requests.Session()
 
-        self.raw = {}
-        self.result = None
+        self.result = {
+            "ip": self.ip,
+            "port": self.port,
+            "country": None,
+            "begin": None,
+            "end": None,
+            "duration": None,
+            "http": {
+                "response_time": None,
+                "level": None,
+                "error": None
+            },
+            "https": {
+                "response_time": None,
+                "level": None,
+                "error": None
+            },
+            "manipulation": {
+                "html": None,
+                "error": None
+            }
+        }
 
-    def __str__(self):
-        rows = [
-            f"{self.result['ip']}:{self.result['port']}",
-            f"http={self.result['http']}",
-            f"https={self.result['https']}",
-            f"content_manipulation={bool(self.result['content_manipulation'])}"
+    def pprint(self):
+        proxy = f"{self.ip}:{self.port}"
+        http = f"{self.result['http']['level']}" if self.result["http"]["level"] else "failed"
+        https = f"{self.result['https']['level']}" if self.result["https"]["level"] else "failed"
+        manipulation = "true" if self.result["manipulation"]["html"] else "false"
+        s = [
+            proxy,
+            f"http={http}",
+            f"https={https}",
+            f"manipulation={manipulation}"
         ]
-        return " ".join(rows)
-
-    def create_result(self):
-        self.result = {}
-        self.result["ip"] = self.ip
-        self.result["port"] = self.port
-        self.result["begin"] = self.raw["begin"]
-        self.result["end"] = self.raw["end"]
-        self.result["http"] = self.raw["check_headers"]["http"]["anonymity_level"]
-        self.result["https"] = self.raw["check_headers"]["https"]["anonymity_level"]
-        if self.raw["check_html"]:
-            self.result["content_manipulation"] = self.raw["check_html"]["content_manipulation"]
-        else:
-            self.result["content_manipulation"] = None
+        s = " | ".join(s)
+        tqdm.write(s)
 
     def anonymity_level(headers, reference_ip):
         if reference_ip in str(headers):
@@ -104,94 +108,72 @@ class Check():
         return "elite"
 
     def run(self):
-        self.begin = get_timestamp()
+        begin = time.time()
 
+        self.check_geo()
         self.check_headers()
-        self.check_html()
+        self.check_manipulation()
 
-        self.end = get_timestamp()
+        end = time.time()
 
-        self.raw["begin"] = self.begin
-        self.raw["end"] = self.end
+        self.result["begin"] = begin
+        self.result["end"] = end
+        self.result["duration"] = round(end-begin, 1)
 
-        self.create_result()
+    def check_geo(self):
+        try:
+            payload = {"ip": self.ip} 
+            r = requests.get("https://ip2c.org/", params=payload)
+            country = r.text.split(";")[1]
+            self.result["country"] = country
+        except Exception:
+            self.result["county"] = None
 
     def check_headers(self):
-        self.raw["check_headers"] = {}
-
         if not self.reference_ip:
             self.reference_ip = Check.get_reference_ip()
 
         for protocol in Check.PROTOCOLS:
-            result = {
-                "status_code": None,
-                "status_code_on_proxy": None,
-                "client_request_headers": None,
-                "server_request_headers": None,
-                "anonymity_level": None,
-                "response_headers": None,
-                "error": None
-            }
-
             self.session.proxies = {protocol: f"{protocol}://{self.proxy}"}
             url = f"{protocol}://{Check.HEADERS_URL}"
 
             try:
-                r = self.session.get(url, timeout=self.timeout)
-                result["status_code"] = r.status_code
-                if r.text == Check.BAD_REQUEST_400:
-                    result["status_code_on_proxy"] = 400
-                result["client_request_headers"] = dict(r.request.headers)
-                result["server_request_headers"] = r.json()
-                result["anonymity_level"] = Check.anonymity_level(
-                    result["server_request_headers"],
-                    self.reference_ip
-                )
-                result["response_headers"] = dict(r.headers)
+                start = time.time()
+                r = self.session.get(url, timeout=Check.TIMEOUT)
+                end = time.time()
 
+                self.result[protocol]["level"] = Check.anonymity_level(r.json(), self.reference_ip)
+                self.result[protocol]["response_time"] = round(end-start, 1)
             except Exception as e:
-                result["error"] = str(type(e))
+                self.result[protocol]["error"] = str(e)
 
-            self.raw["check_headers"][protocol] = result
-
-    def check_html(self):
-        self.raw["check_html"] = None
-
-        if self.raw["check_headers"]["http"]["anonymity_level"]:
+    def check_manipulation(self):
+        if self.result["http"]:
             self.reference_html_hash = hashlib.md5(self.reference_html).digest()
-
-            result = {
-                "status_code": None,
-                "status_code_on_proxy": None,
-                "client_request_headers": None,
-                "response_headers": None,
-                "content_manipulation": None,
-                "error": None
-            }
 
             self.session.proxies = {"http": f"http://{self.proxy}"}
             url = f"http://{Check.HTML_URL}"
 
             try:
-                r = self.session.get(url, timeout=self.timeout)
-                result["status_code"] = r.status_code
-                result["client_request_headers"] = dict(r.request.headers)
-                result["response_headers"] = dict(r.headers)
+                r = self.session.get(url, timeout=Check.TIMEOUT)
                 if r.status_code == 200:
                     html_hash = hashlib.md5(r.content).digest()
                     if html_hash != self.reference_html_hash:
-                        if r.text == Check.BAD_REQUEST_400:
-                            result["status_code_on_proxy"] == 400
-                        else:
-                            result["content_manipulation"] = r.text
+                        if r.text != Check.BAD_REQUEST_400:
+                            self.result["manipulation"]["html"] = r.text
             except Exception as e:
-                result["error"] = str(type(e))
-
-            self.raw["check_html"] = result
+                self.result["manipulation"]["error"] = str(e)
 
 
-def check(proxies, timeout=TIMEOUT):
-    begin = get_timestamp()
+def check_one(proxy, verbose=False):
+    c = Check(proxy)
+    c.run()
+    if verbose:
+        c.pprint()
+    return c.result
+
+
+def check_many(proxies, verbose=False):
     max_threads = cpu_count()*10
     if max_threads > len(proxies):
         threads = len(proxies)
@@ -202,28 +184,31 @@ def check(proxies, timeout=TIMEOUT):
     reference_ip = get_reference_ip()
     amount = len(proxies)
 
-    welcome = f"{__title__} {__version__} | {amount} proxies | {threads} threads"
-    print(welcome)
-
     def worker(proxy):
         c = Check(proxy,
                   reference_html=reference_html,
-                  reference_ip=reference_ip,
-                  timeout=timeout)
+                  reference_ip=reference_ip)
         c.run()
-        tqdm.write(str(c))
+        if verbose:
+            c.pprint()
         return c.result
 
     pool = ThreadPool(threads)
-    results = list(tqdm(pool.imap(worker, proxies), total=amount, desc="Checking proxies"))
+    if verbose:
+        results = list(tqdm(pool.imap(worker, proxies), total=amount, desc="Checking proxies"))
+    else:
+        results = list(pool.imap(worker, proxies))
     pool.close()
     pool.join()
 
-    end = get_timestamp()
+    return results
 
-    return {
-        "begin": begin,
-        "end": end,
-        "threads": threads,
-        "results": results
-    }
+
+def check(proxies, verbose=False):
+    if type(proxies) == str:
+        return check_one(proxies, verbose=verbose) 
+    elif type(proxies) == list:
+        if len(proxies) > 1:
+            return check_many(proxies, verbose=verbose)
+        else:
+            return check_one(proxies[0], verbose=verbose)  
