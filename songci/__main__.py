@@ -2,7 +2,6 @@ import click
 import json
 
 from . import api
-from . import helper
 from .__version__ import __version__
 
 
